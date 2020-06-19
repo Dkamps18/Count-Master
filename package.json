@@ -1,0 +1,11 @@
+{
+  "name": "count-master",
+  "version": "0.0.0",
+  "description": "Discord bot that masters count-to-number channels",
+  "main": "index.js",
+  "author": "Dkamps18",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0"
+  }
+}
