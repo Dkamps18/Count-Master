@@ -1,0 +1,8 @@
+{
+    "channels": {
+        "channel": {
+            "mutedrole": "role id",
+            "log": "log channel id"
+        }
+    }
+}

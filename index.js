@@ -1,7 +1,8 @@
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
-var channels = process.env.channels.split(',')
+const fs = require('fs');
+var config = JSON.parse(fs.readFileSync('config/config.json'));
 
 client.login(process.env.token);
 client.on('ready', () => {
@@ -9,8 +10,23 @@ client.on('ready', () => {
 });
 
 client.on('message', /** @param {import('discord.js').Message} */ async (msg) => {
-	if (channels.includes(msg.channel.id)) {
+	if (config.channels.hasOwnProperty(msg.channel.id)) {
 		var prevmsg = await (await msg.channel.messages.fetch({ limit: 1, before: msg.id })).first();
+		if (prevmsg.editedAt !== null) {
+			prevmsg.member.roles.add(config.channels[msg.channel.id].mutedrole).then(() => {
+				msg.delete();
+				prevmsg.delete();
+				msg.author.send(`Your latest message was removed due to the previous message being edited.`);
+				prevmsg.author.send(`You last message has been deleted and you've been temporarly restricted on suspicion of cheating.`);
+				const embed = {
+					'title': `Muted ${prevmsg.author.tag} on the suspicion of cheating.`,
+					'color': 11141120
+				}
+				client.channels.cache.get(config.channels[msg.channel.id].log).send({ embed })
+			}).catch((err) => {
+				throw err;
+			})
+		}
 		if (msg.author.id == prevmsg.author.id) {
 			msg.delete();
 			msg.author.send(`You can't count further on your own. Please wait for someone else to say the next number.`);
