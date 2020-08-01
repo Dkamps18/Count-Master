@@ -31,10 +31,16 @@ client.on('message', /** @param {import('discord.js').Message} */ async (msg) =>
 			msg.delete();
 			msg.author.send(`You can't count further on your own. Please wait for someone else to say the next number.`);
 		} else {
-			var dif = parseInt(msg.content) - parseInt(prevmsg.content);
-			if (isNaN(dif)) {
+			msg.content = parseInt(msg.content);
+			prevmsg.content = parseInt(prevmsg.content);
+			var dif = msg.content - prevmsg.content;
+			if (isNaN(msg.content)) {
 				msg.delete();
 				msg.author.send(`Please don't talk in a count-to-number channel.`);
+			} else if (isNaN(prevmsg.content)) {
+				msg.delete();
+				prevmsg.delete();
+				msg.author.send(`Apparently someone was able to talk in a count-to-number channel :thinking:.`);
 			} else if (dif == 0) {
 				msg.delete();
 				msg.author.send(`You're supposed to say the next number to the same number.`);
