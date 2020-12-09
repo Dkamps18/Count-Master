@@ -13,19 +13,21 @@ client.on('message', /** @param {import('discord.js').Message} */ async (msg) =>
 	if (config.channels.hasOwnProperty(msg.channel.id)) {
 		var prevmsg = await (await msg.channel.messages.fetch({ limit: 1, before: msg.id })).first();
 		if (prevmsg.editedAt !== null) {
-			prevmsg.member.roles.add(config.channels[msg.channel.id].mutedrole).then(() => {
-				msg.delete();
-				prevmsg.delete();
-				msg.author.send(`Your latest message was removed due to the previous message being edited.`);
-				prevmsg.author.send(`You last message has been deleted and you've been temporarly restricted on suspicion of cheating.`);
-				const embed = {
-					'title': `Muted ${prevmsg.author.tag} on the suspicion of cheating.`,
-					'color': 11141120
-				}
-				client.channels.cache.get(config.channels[msg.channel.id].log).send({ embed })
-			}).catch((err) => {
-				throw err;
-			})
+			msg.delete();
+			prevmsg.delete();
+			msg.author.send(`Your latest message was removed due to the previous message being edited.`);
+			if (config.channels[msg.channel.id].mutedrole !== "0" && config.channels[msg.channel.id].log !== "0") {
+				prevmsg.member.roles.add(config.channels[msg.channel.id].mutedrole).then(() => {
+					prevmsg.author.send(`You last message has been deleted and you've been temporarly restricted on suspicion of cheating.`);
+					const embed = {
+						'title': `Muted ${prevmsg.author.tag} on the suspicion of cheating.`,
+						'color': 11141120
+					}
+					client.channels.cache.get(config.channels[msg.channel.id].log).send({ embed })
+				}).catch((err) => {
+					throw err;
+				})
+			}
 		}
 		if (msg.author.id == prevmsg.author.id) {
 			msg.delete();
